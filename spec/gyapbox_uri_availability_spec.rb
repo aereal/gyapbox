@@ -35,4 +35,32 @@ describe Gyapbox::URI::Availability do
       end
     end
   end
+
+  describe "#retry_with" do
+    context "succeeds with 2nd iteration" do
+      let(:callback) { ->(try) { try > 1 } }
+
+      context "with 3 retries" do
+        let(:retry_count) { 3 }
+
+        it "succeeds" do
+          expect {
+            availability.retry_with(retry_count, &callback)
+          }.not_to raise_error
+        end
+      end
+
+      context "with 0 retries" do
+        let(:retry_count) { 0 }
+
+        it "fails with CannotSucceedWithinRetriesError" do
+          expect {
+            availability.retry_with(retry_count, &callback)
+          }.to raise_error {|e|
+            expect(e).to be_a(Gyapbox::URI::Availability::CannotSucceedWithinRetriesError)
+          }
+        end
+      end
+    end
+  end
 end
