@@ -1,2 +1,4 @@
 --color
 --format progress
+-I./spec
+-rspec_helper
